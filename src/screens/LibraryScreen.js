@@ -86,13 +86,19 @@ export class LibraryScreen {
   }
 
   async loadData() {
-    const user = this.authService.getCurrentUser();
-    if (!user) {
+    // Check authentication using localStorage
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    if (!isAuthenticated) {
       this.router.navigate('/login');
       return;
     }
 
-    const completed = await this.activitiesService.getUserCompletedActivities(user.uid);
+    // Load from localStorage instead of Firebase for MVP
+    const completedActivities = JSON.parse(localStorage.getItem('completedActivities') || '[]');
+    const completed = completedActivities.map(activity => ({
+      ...activity,
+      completedAt: activity.completedAt ? { toDate: () => new Date(activity.completedAt) } : null
+    }));
     
     // Group activities by date
     this.activitiesByDate = {};
@@ -155,7 +161,8 @@ export class LibraryScreen {
 
     // Show first activity (or could show all)
     const activity = activities[0];
-    const activityDate = activity.completedAt?.toDate ? activity.completedAt.toDate() : new Date(activity.completedAt);
+    const activityDate = activity.completedAt?.toDate ? activity.completedAt.toDate() : 
+                         (activity.completedAt ? new Date(activity.completedAt) : new Date());
     
     detailEl.innerHTML = `
       <div class="card">

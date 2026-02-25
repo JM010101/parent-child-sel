@@ -9,6 +9,21 @@ export class LoginScreen {
     this.router = router;
   }
 
+  // Simple credential check - bypasses Firebase for MVP
+  checkCredentials(email, password) {
+    const testEmail = 'test_user@test.com';
+    const testPassword = 'test-password';
+    
+    return email === testEmail && password === testPassword;
+  }
+
+  // Mock login - sets a flag in localStorage
+  mockLogin() {
+    localStorage.setItem('isAuthenticated', 'true');
+    localStorage.setItem('userEmail', 'test_user@test.com');
+    return { success: true };
+  }
+
   render(container) {
     container.innerHTML = `
       <div class="container">
@@ -59,22 +74,29 @@ export class LoginScreen {
       document.getElementById('password').value = 'test-password';
     });
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const email = document.getElementById('email').value;
+      const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
 
-      const result = await this.authService.signIn(email, password);
-      if (result.success) {
-        this.router.navigate('/onboarding');
+      // Simple credential check - bypass Firebase
+      if (this.checkCredentials(email, password)) {
+        this.mockLogin();
+        // Check if user has completed onboarding
+        const hasOnboarding = localStorage.getItem('hasOnboarding') === 'true';
+        if (hasOnboarding) {
+          this.router.navigate('/home');
+        } else {
+          this.router.navigate('/onboarding');
+        }
       } else {
-        errorMessage.textContent = result.error;
+        errorMessage.textContent = 'Invalid credentials. Use test_user@test.com / test-password';
         errorMessage.style.display = 'block';
       }
     });
 
-    signUpBtn.addEventListener('click', async () => {
-      const email = document.getElementById('email').value;
+    signUpBtn.addEventListener('click', () => {
+      const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
 
       if (!email || !password) {
@@ -83,11 +105,12 @@ export class LoginScreen {
         return;
       }
 
-      const result = await this.authService.signUp(email, password);
-      if (result.success) {
+      // For MVP, sign up also just checks credentials
+      if (this.checkCredentials(email, password)) {
+        this.mockLogin();
         this.router.navigate('/onboarding');
       } else {
-        errorMessage.textContent = result.error;
+        errorMessage.textContent = 'Please use test credentials: test_user@test.com / test-password';
         errorMessage.style.display = 'block';
       }
     });

@@ -188,8 +188,9 @@ export class OnboardingScreen {
   }
 
   async saveFocusAreas() {
-    const user = this.authService.getCurrentUser();
-    if (!user) {
+    // Check if user is authenticated (using localStorage)
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    if (!isAuthenticated) {
       this.router.navigate('/login');
       return;
     }
@@ -201,11 +202,10 @@ export class OnboardingScreen {
       calendarConnected: this.calendarConnected
     };
 
-    const result = await this.userService.saveFocusAreas(user.uid, focusAreas);
-    if (result.success) {
-      this.router.navigate('/home');
-    } else {
-      alert('Error saving preferences: ' + result.error);
-    }
+    // Save to localStorage instead of Firebase for MVP
+    localStorage.setItem('focusAreas', JSON.stringify(focusAreas));
+    localStorage.setItem('hasOnboarding', 'true');
+    
+    this.router.navigate('/home');
   }
 }

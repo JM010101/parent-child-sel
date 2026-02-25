@@ -55,14 +55,16 @@ export class HomeScreen {
   }
 
   async loadData() {
-    const user = this.authService.getCurrentUser();
-    if (!user) {
+    // Check authentication using localStorage
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    if (!isAuthenticated) {
       this.router.navigate('/login');
       return;
     }
 
-    // Load recent activities
-    const completed = await this.activitiesService.getUserCompletedActivities(user.uid);
+    // Load recent activities from localStorage (for MVP)
+    const completedActivities = JSON.parse(localStorage.getItem('completedActivities') || '[]');
+    const completed = completedActivities;
     const recentContainer = document.getElementById('recentActivities');
     
     if (completed.length === 0) {
@@ -77,7 +79,7 @@ export class HomeScreen {
           <div style="flex: 1;">
             <h4 style="margin-bottom: 4px;">${activity.activityTitle || 'Activity'}</h4>
             <p style="font-size: 14px; color: var(--light-text); margin-bottom: 8px;">
-              ${activity.reflection || 'Completed activity'}
+              ${activity.parentReflections || activity.reflection || 'Completed activity'}
             </p>
             <div class="filter-group" style="margin: 0;">
               ${(activity.skills || []).map(skill => `

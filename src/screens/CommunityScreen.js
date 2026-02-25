@@ -1,5 +1,3 @@
-import { collection, getDocs, addDoc, query, orderBy, limit } from 'firebase/firestore';
-import { db } from '../config/firebase.js';
 import { AuthService } from '../services/auth.js';
 import { AudioService } from '../services/audio.js';
 
@@ -71,10 +69,12 @@ export class CommunityScreen {
 
   async loadReflections() {
     try {
-      const reflectionsRef = collection(db, 'communityReflections');
-      const q = query(reflectionsRef, orderBy('createdAt', 'desc'), limit(20));
-      const snapshot = await getDocs(q);
-      this.reflections = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      // Load from localStorage instead of Firestore for MVP
+      const communityReflections = JSON.parse(localStorage.getItem('communityReflections') || '[]');
+      this.reflections = communityReflections
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 20)
+        .map((reflection, index) => ({ id: `local_${index}`, ...reflection }));
       this.renderReflections();
     } catch (error) {
       console.error('Error loading reflections:', error);
@@ -166,11 +166,14 @@ export class CommunityScreen {
   }
 
   async submitReflection() {
-    const user = this.authService.getCurrentUser();
-    if (!user) {
+    // Check authentication using localStorage
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    if (!isAuthenticated) {
       alert('Please log in to share reflections');
       return;
     }
+    
+    const userId = 'test_user'; // Mock user ID for MVP
 
     const activityTitle = document.getElementById('activityTitle').value.trim();
     const reflectionText = document.getElementById('reflectionText').value.trim();
@@ -181,24 +184,23 @@ export class CommunityScreen {
     }
 
     try {
-      // Upload audio if recorded
+      // Upload audio if recorded (skip for MVP)
       let audioUrl = null;
       if (this.communityAudioBlob) {
-        const audioService = new AudioService();
-        const result = await audioService.uploadAudio(user.uid, 'community', this.communityAudioBlob);
-        if (result.success) {
-          audioUrl = result.url;
-        }
+        // For MVP, just note that audio was recorded
+        audioUrl = 'recorded'; // Placeholder
       }
 
-      // Save to Firestore
-      await addDoc(collection(db, 'communityReflections'), {
+      // Save to localStorage instead of Firestore for MVP
+      const communityReflections = JSON.parse(localStorage.getItem('communityReflections') || '[]');
+      communityReflections.push({
         activityTitle,
         text: reflectionText,
         audioUrl,
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
         anonymous: true
       });
+      localStorage.setItem('communityReflections', JSON.stringify(communityReflections));
 
       // Clear form
       document.getElementById('activityTitle').value = '';

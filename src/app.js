@@ -31,20 +31,24 @@ export class App {
     // Initialize router
     this.router.init();
 
-    // Check authentication status
-    this.authService.onAuthStateChanged((user) => {
-      const path = window.location.pathname;
-      const publicRoutes = ['/', '/login'];
-      
-      if (!user && !publicRoutes.includes(path)) {
-        this.router.navigate('/login');
-      } else if (user && (path === '/' || path === '/login')) {
-        this.router.navigate('/home');
-      }
-    });
+    // Check authentication status (using localStorage instead of Firebase)
+    this.checkAuthStatus();
 
     // Set up services for screens that need them
     this.setupScreenServices();
+  }
+
+  checkAuthStatus() {
+    const path = window.location.pathname;
+    const publicRoutes = ['/', '/login'];
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    
+    if (!isAuthenticated && !publicRoutes.includes(path)) {
+      this.router.navigate('/login');
+    } else if (isAuthenticated && (path === '/' || path === '/login')) {
+      const hasOnboarding = localStorage.getItem('hasOnboarding') === 'true';
+      this.router.navigate(hasOnboarding ? '/home' : '/onboarding');
+    }
   }
 
   setupScreenServices() {

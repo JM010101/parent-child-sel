@@ -233,11 +233,14 @@ export class ActivityScreen {
   }
 
   async saveReflection(container, skip) {
-    const user = this.authService.getCurrentUser();
-    if (!user) {
+    // Check authentication using localStorage
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    if (!isAuthenticated) {
       this.router.navigate('/login');
       return;
     }
+    
+    const userId = 'test_user'; // Mock user ID for MVP
 
     // Collect reflections
     const childReflections = [];
@@ -251,15 +254,12 @@ export class ActivityScreen {
       if (el.value.trim()) parentReflections.push(el.value.trim());
     });
 
-    // Upload audio if recorded
+    // Upload audio if recorded (skip for MVP - just store blob reference)
     let audioUrl = null;
     if (this.audioBlob && !skip) {
-      const { AudioService } = await import('../services/audio.js');
-      const audioService = new AudioService();
-      const result = await audioService.uploadAudio(user.uid, this.activityId, this.audioBlob);
-      if (result.success) {
-        audioUrl = result.url;
-      }
+      // For MVP, we'll just note that audio was recorded
+      // In production, this would upload to Firebase Storage
+      audioUrl = 'recorded'; // Placeholder
     }
 
     const activityData = {
@@ -269,17 +269,14 @@ export class ActivityScreen {
       childReflections,
       parentReflections: parentReflections.join('\n\n'),
       audioUrl,
-      completedAt: new Date()
+      completedAt: new Date().toISOString()
     };
 
-    const { ActivitiesService } = await import('../services/activities.js');
-    const activitiesService = new ActivitiesService();
-    const result = await activitiesService.saveCompletedActivity(user.uid, activityData);
+    // Save to localStorage instead of Firebase for MVP
+    const completedActivities = JSON.parse(localStorage.getItem('completedActivities') || '[]');
+    completedActivities.push(activityData);
+    localStorage.setItem('completedActivities', JSON.stringify(completedActivities));
 
-    if (result.success) {
-      this.router.navigate('/library');
-    } else {
-      alert('Error saving reflection: ' + result.error);
-    }
+    this.router.navigate('/library');
   }
 }
