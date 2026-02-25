@@ -9,6 +9,10 @@ export class LoginScreen {
     this.router = router;
   }
 
+  setRouter(router) {
+    this.router = router;
+  }
+
   // Simple credential check - bypasses Firebase for MVP
   checkCredentials(email, password) {
     const testEmail = 'test_user@test.com';
@@ -68,6 +72,9 @@ export class LoginScreen {
     const fillTestBtn = document.getElementById('fillTestBtn');
     const errorMessage = document.getElementById('errorMessage');
 
+    // Get router reference (use window.appRouter as fallback)
+    const router = this.router || window.appRouter;
+
     // Fill test credentials
     fillTestBtn.addEventListener('click', () => {
       document.getElementById('email').value = 'test_user@test.com';
@@ -85,9 +92,17 @@ export class LoginScreen {
         // Check if user has completed onboarding
         const hasOnboarding = localStorage.getItem('hasOnboarding') === 'true';
         if (hasOnboarding) {
-          this.router.navigate('/home');
+          if (router) {
+            router.navigate('/home');
+          } else {
+            window.location.href = '/home';
+          }
         } else {
-          this.router.navigate('/onboarding');
+          if (router) {
+            router.navigate('/onboarding');
+          } else {
+            window.location.href = '/onboarding';
+          }
         }
       } else {
         errorMessage.textContent = 'Invalid credentials. Use test_user@test.com / test-password';
@@ -108,7 +123,11 @@ export class LoginScreen {
       // For MVP, sign up also just checks credentials
       if (this.checkCredentials(email, password)) {
         this.mockLogin();
-        this.router.navigate('/onboarding');
+        if (router) {
+          router.navigate('/onboarding');
+        } else {
+          window.location.href = '/onboarding';
+        }
       } else {
         errorMessage.textContent = 'Please use test credentials: test_user@test.com / test-password';
         errorMessage.style.display = 'block';

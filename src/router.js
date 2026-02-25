@@ -68,10 +68,16 @@ export class Router {
       app.innerHTML = '';
       const component = new ComponentClass();
       
-      // Inject router and services
-      if (component.setRouter && window.appRouter) {
-        component.setRouter(window.appRouter);
+      // Inject router first (most screens need this)
+      if (window.appRouter) {
+        if (component.setRouter) {
+          component.setRouter(window.appRouter);
+        }
+        // Also set router property directly for compatibility
+        component.router = window.appRouter;
       }
+      
+      // Inject services if method exists
       if (component.setServices && window.authService) {
         component.setServices(window.authService, window.appRouter);
       }
