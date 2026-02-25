@@ -1,0 +1,21 @@
+{
+  "name": "paren-cel",
+  "version": "1.0.0",
+  "description": "MVP for research-backed educational app supporting parents in embedding SEL activities",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "vite preview"
+  },
+  "keywords": ["sel", "education", "parenting", "mobile-app"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "firebase": "^10.7.0"
+  }
+}
