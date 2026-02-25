@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.js": "javascript"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}

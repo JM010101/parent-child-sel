@@ -55,26 +55,38 @@ export class MissionsScreen {
 
   renderSkillFilters() {
     const skills = ['All', 'Self-Awareness', 'Self-Management', 'Social Awareness', 'Relationship Skills', 'Responsible Decision-Making'];
-    return skills.map(skill => `
-      <span class="tag ${this.filters.skill === skill.toLowerCase() || (skill === 'All' && this.filters.skill === 'all') ? 'tag-selected' : 'tag-unselected'}" 
-            data-skill="${skill === 'All' ? 'all' : skill}">
-        ${skill}
-      </span>
-    `).join('');
+    return skills.map(skill => {
+      const skillValue = skill === 'All' ? 'all' : skill;
+      const isSelected = this.filters.skill === skillValue || (skill === 'All' && this.filters.skill === 'all');
+      return `
+        <span class="tag ${isSelected ? 'tag-selected' : 'tag-unselected'}" 
+              data-skill="${skillValue}">
+          ${skill}
+        </span>
+      `;
+    }).join('');
   }
 
   renderScenarioFilters() {
     const scenarios = ['All', 'Bedtime', 'Free Time', 'On the Way to School', 'After School', 'Weekend Morning', 'Mealtime'];
-    return scenarios.map(scenario => `
-      <span class="tag ${this.filters.scenario === scenario.toLowerCase() || (scenario === 'All' && this.filters.scenario === 'all') ? 'tag-selected' : 'tag-unselected'}" 
-            data-scenario="${scenario === 'All' ? 'all' : scenario}">
-        ${scenario}
-      </span>
-    `).join('');
+    return scenarios.map(scenario => {
+      const scenarioValue = scenario === 'All' ? 'all' : scenario;
+      const isSelected = this.filters.scenario === scenarioValue || (scenario === 'All' && this.filters.scenario === 'all');
+      return `
+        <span class="tag ${isSelected ? 'tag-selected' : 'tag-unselected'}" 
+              data-scenario="${scenarioValue}">
+          ${scenario}
+        </span>
+      `;
+    }).join('');
   }
 
   async loadActivities() {
     this.activities = await this.activitiesService.filterActivities(this.filters);
+    // Re-render filters to update selected state
+    document.getElementById('skillFilters').innerHTML = this.renderSkillFilters();
+    document.getElementById('scenarioFilters').innerHTML = this.renderScenarioFilters();
+    this.attachEventListeners();
     this.renderActivities();
   }
 

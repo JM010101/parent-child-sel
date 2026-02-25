@@ -139,7 +139,7 @@ export class CommunityScreen {
     // Audio recording
     let recording = false;
     let audioService = null;
-    let audioBlob = null;
+    this.communityAudioBlob = null;
 
     audioRecorder.addEventListener('click', async () => {
       if (!audioService) {
@@ -159,15 +159,9 @@ export class CommunityScreen {
           recording = false;
           audioRecorder.classList.remove('recording');
           document.getElementById('communityRecordingStatus').textContent = 'Recording saved';
-          audioBlob = result.audioBlob;
+          this.communityAudioBlob = result.audioBlob;
         }
       }
-    });
-
-    // Store audioBlob for submission
-    this.communityAudioBlob = null;
-    audioRecorder.addEventListener('click', async () => {
-      // This will be handled by the click handler above
     });
   }
 

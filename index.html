@@ -8,6 +8,16 @@
     <link rel="stylesheet" href="/src/styles/main.css">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#4A7C59">
+    <script>
+      // Register service worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('Service Worker registered'))
+            .catch(err => console.log('Service Worker registration failed'));
+        });
+      }
+    </script>
 </head>
 <body>
     <div id="app"></div>

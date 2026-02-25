@@ -34,12 +34,48 @@ export class Router {
 
   handleRoute() {
     const path = window.location.pathname || '/';
-    const route = this.routes[path] || this.routes['/'];
     
-    if (route) {
+    // Check for exact match first
+    let ComponentClass = this.routes[path];
+    
+    // Check for activity route pattern
+    if (!ComponentClass && window.activityRoutePattern && window.activityRoutePattern.test(path)) {
+      ComponentClass = window.ActivityScreen;
+    }
+    
+    // If exact match not found, check for dynamic routes (e.g., /activity/:id)
+    if (!ComponentClass) {
+      for (const [routePath, component] of Object.entries(this.routes)) {
+        if (routePath.includes(':')) {
+          // Convert route pattern to regex
+          const pattern = '^' + routePath.replace(/:[^/]+/g, '([^/]+)') + '$';
+          const regex = new RegExp(pattern);
+          if (regex.test(path)) {
+            ComponentClass = component;
+            break;
+          }
+        }
+      }
+    }
+    
+    // Fallback to default route
+    if (!ComponentClass) {
+      ComponentClass = this.routes['/'] || this.routes['/login'];
+    }
+    
+    if (ComponentClass) {
       const app = document.getElementById('app');
       app.innerHTML = '';
-      const component = new route();
+      const component = new ComponentClass();
+      
+      // Inject router and services
+      if (component.setRouter && window.appRouter) {
+        component.setRouter(window.appRouter);
+      }
+      if (component.setServices && window.authService) {
+        component.setServices(window.authService, window.appRouter);
+      }
+      
       component.render(app);
       this.currentRoute = path;
     }
