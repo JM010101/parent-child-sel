@@ -89,7 +89,12 @@ export class LibraryScreen {
     // Check authentication using localStorage
     const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
     if (!isAuthenticated) {
-      this.router.navigate('/login');
+      const router = this.router || window.appRouter;
+      if (router) {
+        router.navigate('/login');
+      } else {
+        window.location.href = '/login';
+      }
       return;
     }
 

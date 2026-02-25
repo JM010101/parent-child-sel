@@ -191,7 +191,12 @@ export class OnboardingScreen {
     // Check if user is authenticated (using localStorage)
     const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
     if (!isAuthenticated) {
-      this.router.navigate('/login');
+      const router = this.router || window.appRouter;
+      if (router) {
+        router.navigate('/login');
+      } else {
+        window.location.href = '/login';
+      }
       return;
     }
 
@@ -206,6 +211,12 @@ export class OnboardingScreen {
     localStorage.setItem('focusAreas', JSON.stringify(focusAreas));
     localStorage.setItem('hasOnboarding', 'true');
     
-    this.router.navigate('/home');
+    // Use router with fallback
+    const router = this.router || window.appRouter;
+    if (router) {
+      router.navigate('/home');
+    } else {
+      window.location.href = '/home';
+    }
   }
 }

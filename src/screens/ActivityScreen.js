@@ -75,10 +75,13 @@ export class ActivityScreen {
       </div>
     `;
 
-    document.getElementById('continueBtn').addEventListener('click', () => {
-      this.currentStep = 2;
-      this.renderStep(container);
-    });
+    const continueBtn = document.getElementById('continueBtn');
+    if (continueBtn) {
+      continueBtn.addEventListener('click', () => {
+        this.currentStep = 2;
+        this.renderStep(container);
+      });
+    }
   }
 
   renderStep2(container) {
@@ -121,15 +124,21 @@ export class ActivityScreen {
       </div>
     `;
 
-    document.getElementById('backBtn').addEventListener('click', () => {
-      this.currentStep = 1;
-      this.renderStep(container);
-    });
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        this.currentStep = 1;
+        this.renderStep(container);
+      });
+    }
 
-    document.getElementById('continueBtn').addEventListener('click', () => {
-      this.currentStep = 3;
-      this.renderStep(container);
-    });
+    const continueBtn = document.getElementById('continueBtn');
+    if (continueBtn) {
+      continueBtn.addEventListener('click', () => {
+        this.currentStep = 3;
+        this.renderStep(container);
+      });
+    }
   }
 
   renderStep3(container) {
@@ -236,7 +245,12 @@ export class ActivityScreen {
     // Check authentication using localStorage
     const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
     if (!isAuthenticated) {
-      this.router.navigate('/login');
+      const router = this.router || window.appRouter;
+      if (router) {
+        router.navigate('/login');
+      } else {
+        window.location.href = '/login';
+      }
       return;
     }
     
@@ -277,6 +291,11 @@ export class ActivityScreen {
     completedActivities.push(activityData);
     localStorage.setItem('completedActivities', JSON.stringify(completedActivities));
 
-    this.router.navigate('/library');
+    const router = this.router || window.appRouter;
+    if (router) {
+      router.navigate('/library');
+    } else {
+      window.location.href = '/library';
+    }
   }
 }

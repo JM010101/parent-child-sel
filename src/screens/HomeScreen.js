@@ -58,7 +58,12 @@ export class HomeScreen {
     // Check authentication using localStorage
     const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
     if (!isAuthenticated) {
-      this.router.navigate('/login');
+      const router = this.router || window.appRouter;
+      if (router) {
+        router.navigate('/login');
+      } else {
+        window.location.href = '/login';
+      }
       return;
     }
 
@@ -97,7 +102,12 @@ export class HomeScreen {
     if (startBtn) {
       startBtn.addEventListener('click', () => {
         // Navigate to a random activity or suggested one
-        this.router.navigate('/missions');
+        const router = this.router || window.appRouter;
+        if (router) {
+          router.navigate('/missions');
+        } else {
+          window.location.href = '/missions';
+        }
       });
     }
   }

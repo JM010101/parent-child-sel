@@ -124,7 +124,12 @@ export class MissionsScreen {
     document.querySelectorAll('.activity-card').forEach(card => {
       card.addEventListener('click', () => {
         const activityId = card.getAttribute('data-activity-id');
-        this.router.navigate(`/activity/${activityId}`);
+        const router = this.router || window.appRouter;
+        if (router) {
+          router.navigate(`/activity/${activityId}`);
+        } else {
+          window.location.href = `/activity/${activityId}`;
+        }
       });
     });
   }
